@@ -37,7 +37,6 @@
           <span class="defdl_text">{{item.time}}:00</span>
           <!-- <video class="video_url_card" v-for="(item1,index1) in item.url" :src="item1" @click="reVio('1',item1,index1)"></video> -->
 
-
           <video class="video_url_card" :src="item.url[0]" @click="reVio('1',item.url)"></video>
         </span>
       </span>
