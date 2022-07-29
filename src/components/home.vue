@@ -19,11 +19,12 @@
       <button @click="screen()">筛选</button>
     </div>
     
-     <div class="canvas_fl"
+     <div class="canvas_fl" 
      ref="canvasf"
      @click="dblclickFunc" 
      @mousedown="mousedownFunc" 
      @mouseout="mouseoutFunc">
+    
       <canvas ref="canvas" id="timeline" width="1500" height="90" style="cursor: pointer;background-color: #2b2f33;" ></canvas>
     </div>
 
@@ -36,6 +37,7 @@
           <!-- <span>{{item.time}}:00</span> -->
           <span class="defdl_text">{{item.time}}:00</span>
           <!-- <video class="video_url_card" v-for="(item1,index1) in item.url" :src="item1" @click="reVio('1',item1,index1)"></video> -->
+
 
           <video class="video_url_card" :src="item.url[0]" @click="reVio('1',item.url)"></video>
         </span>
@@ -82,6 +84,8 @@
 import selector from 'views/LazyFiltering/timeSelector'
 import DPlayer from 'dplayer'
 import { request } from '../network/request'
+// import VirtualRuler from 'virtual-ruler'
+// import { BigNumber } from 'bignumber.js';
 // import {getBackupTimeline} from "@/plugins/axios";
 export default {
   data() {
@@ -109,6 +113,7 @@ export default {
       event:null,pre:0,poTime:null,Pxt:0,defPrx:null,
       defDataList:[],
       videoLists:[],ismousemove:true,
+      deftimes:[],
       timecell:[
         {
           beginTime:new Date().getTime() - 5000000,
@@ -118,7 +123,7 @@ export default {
           filterList:[
             {
               beginTime:new Date().getTime() - 5000000,
-              endTime:new Date().getTime() - 5000000 + 120 * 1000,
+              endTime:new Date().getTime() - 5000000 + 50 * 1000,
               background:"rgba(221, 116, 48,0.5)",
             },
             {
@@ -128,14 +133,39 @@ export default {
             },
             {
               beginTime:new Date().getTime() - 5000000,
-              endTime:new Date().getTime() - 5000000 + 70 * 1000,
+              endTime:new Date().getTime() - 5000000 + 50 * 1000,
               background:"rgba(255, 0, 45,1)"
             },
             {
               beginTime:new Date().getTime() - 5000000,
-              endTime:new Date().getTime() - 5000000 + 80 * 1000,
+              endTime:new Date().getTime() - 5000000 + 50 * 1000,
               background:"rgba(18, 134, 244,1)"
-            }
+            },
+            {
+              beginTime:new Date().getTime() - 5000000 + 120 * 1000,
+              endTime:new Date().getTime() - 5000000 + 170 * 1000,
+              background:"red"
+            },
+            {
+              beginTime:new Date().getTime() - 5000000 + 120 * 1000,
+              endTime:new Date().getTime() - 5000000 + 180 * 1000,
+              background:"red"
+            },
+            {
+              beginTime:new Date().getTime() - 5000000 + 120 * 1000,
+              endTime:new Date().getTime() - 5000000 + 190 * 1000,
+              background:"red"
+            },
+            {
+              beginTime:new Date().getTime() - 5000000 + 200 * 1000,
+              endTime:new Date().getTime() - 5000000 + 230 * 1000,
+              background:"red"
+            },
+            {
+              beginTime:new Date().getTime() - 5000000 + 200 * 1000,
+              endTime:new Date().getTime() - 5000000 + 250 * 1000,
+              background:"red"
+            },
           ]
         },
         {
@@ -219,10 +249,13 @@ export default {
   components:{
     selector,
     request,
+    // VirtualRuler,
+    // BigNumber
   },
   
   created(){
     const self = this
+
 
     for (let i = 0; i <= 23; i++) {
       let ti = i < 10 ? '0' + i : i
@@ -230,11 +263,14 @@ export default {
     }
     
     for(let k = 0;k <self.timecell.length;k++){
-      self.timecell[k]['timeSlot'] = new Date(self.timecell[k].beginTime).getHours()      
+      self.timecell[k]['timeSlot'] = new Date(self.timecell[k].beginTime).getHours()
+      // self.timecell[k]['muins'] = new Date(self.timecell[k].beginTime).getHours() + ":" + new Date(self.timecell[k].beginTime).getMinutes()
     }
+
 
     self.timeNum = 0
     self.getTimeDate()
+
   },
   mounted () {
     const self = this
@@ -254,6 +290,7 @@ export default {
           url:self.videoUrl
         }
      })
+    //  console.log('this.$refs.dplayers===',this.$refs);
 
     self.getdplayers.on('play', function () {
       self.setTimeData()
@@ -266,20 +303,19 @@ export default {
       if(self.isplay == false){
         if(self.dpTime != null){
           self.clearCanvas();
-          let bb =  Math.round(defN) 
-          let aa =  Math.round(self.dpTime) 
-          let cc = bb - aa
+          let getCurrent =  Math.round(defN) 
+          let defDpTime =  Math.round(self.dpTime) 
+          let aNum = getCurrent - defDpTime
           if(Math.sign(self.dpTime - defN) == -1){
-            let oi =  Math.round(cc) 
-            // console.log('self.dpTime - defN====', Math.round(cc) );
+            let oi =  Math.round(aNum) 
             self.start_timestamp = self.start_timestamp + oi * 1000
-            self.dpTime = bb
+            self.dpTime = getCurrent
           }else{
-            let io =  Math.round(cc) 
+            let io =  Math.round(aNum) 
             // console.log('正数',);
             self.start_timestamp = self.start_timestamp + io * 1000
             // console.log('self.start_timestamp===',);
-            self.dpTime = bb
+            self.dpTime = getCurrent
           }
           if(self.isdunums == 1){
             self.init(self.start_timestamp,self.timecell,self.defnums - 1);
@@ -331,12 +367,10 @@ export default {
 
     // console.log('self.defDataList===',self.defDataList);
   },
-
   methods: {
     TimeS(){
 
     },
-
     getTimeDate(){
       const self = this
 
@@ -352,7 +386,6 @@ export default {
       }
 
     },
-
     //筛选类型、日期、列表视频
     screen(){
       const self = this
@@ -372,11 +405,12 @@ export default {
       }
     },
 
+    //设置视频播放完成后执行
+
     //关闭弹窗
     handleClose(done){
       done();
     },
-
     formateTime(time) {
       
       const h = parseInt(((time / 3600) * 100) /100).toFixed(0)
@@ -404,7 +438,6 @@ export default {
       // s = date.getSeconds()
       return h + m
     },
-
     //更换视频
     reVio(num,Url,index){
       const self = this
@@ -479,7 +512,6 @@ export default {
       }
 
     },
-
     codTime(){
       const self = this
       setTimeout(()=>{self.isplay = false},300)
@@ -604,8 +636,21 @@ export default {
       cells.map(m=>{
         self.draw_cell(m,'1')
         if(m.filterList != undefined){
-          m.filterList.filter((o,i)=>{
-            o["RHeight"] = (i + 1) * 15
+          m.filterList.filter((o,i,arr)=>{
+            if(arr.length > 1){
+              let defoL = arr[0].beginTime
+              if(i != 0 && arr[i].beginTime == arr[i - 1].beginTime){
+                arr[i]["RHeight"] = arr[i - 1]["RHeight"] + 15
+              }else{
+                if(defoL == arr[i].beginTime){
+                  o["RHeight"] = (i + 1) * 15
+                }else{
+                  o["RHeight"] = 15
+                }
+              }
+            }else{
+              o["RHeight"] = (i + 1) * 15
+            }
             self.draw_cell(o,'2')
           })
         }
@@ -994,11 +1039,11 @@ export default {
       deflist.sort((res,bat)=>{
         return Math.abs(res - self.start_timestamp) - Math.abs(bat - self.start_timestamp)
       })
-      let aa = 0
+      let foo = 0
       for(let i=0;i<self.timecell.length;i++){
 
         if(self.start_timestamp >= self.timecell[i].beginTime - andTime && self.start_timestamp < self.timecell[i].endTime - andTime){
-          aa = 1
+          foo = 1
           self.defPrx = self.Pxt
           break
         }else{
@@ -1009,14 +1054,14 @@ export default {
           }
           // console.log("i===",i);
           self.defPrx = null
-          aa = 2
+          foo = 2
         }
       }
 
       setTimeout(()=>{
-        if(aa == 1){
+        if(foo == 1){
           self.set_time_to_middle(self.returnTime,'1');
-        }else if(aa == 2){
+        }else if(foo == 2){
           self.set_time_to_middle(self.returnTime,'2',Purl,deflist[0]);
         }
       },100)

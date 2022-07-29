@@ -1,6 +1,5 @@
 # timeaxis
 
-# 第一次写记录一下
 # Scalable recording timeline
 # 录像时间轴播放 
 
