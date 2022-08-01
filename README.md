@@ -1,10 +1,9 @@
 # timeaxis
 
-# Scalable recording timeline
-# 录像时间轴播放 
+Scalable recording timeline
+录像时间轴播放 
 
 ## Project setup | Start project
-## 安装运行 |  启动
 yarn install | yarn serve
 
 
